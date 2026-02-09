@@ -415,10 +415,16 @@
             transition: opacity 0.8s ease;
             border-radius: 10px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            cursor: grab;
+        }
+
+        .fireworks-video:active {
+            cursor: grabbing;
         }
 
         .fireworks-video.show {
             opacity: 1;
+            pointer-events: auto;
         }
 
         .fireworks-video video {
@@ -556,9 +562,33 @@
     </audio>
 </div>
 
-<div class="fireworks-video" id="fireworksVideo">
+<div class="fireworks-video draggable-video">
     <video autoplay muted loop>
         <source src="857068-hd_1280_720_30fps.mp4" type="video/mp4">
+    </video>
+</div>
+
+<div class="fireworks-video draggable-video" style="width: 240px; height: 240px;">
+    <video autoplay muted loop>
+        <source src="catto.mp4" type="video/mp4">
+    </video>
+</div>
+
+<div class="fireworks-video draggable-video" style="width: 250px; height: 300px;">
+    <video autoplay muted loop>
+        <source src="happy-cat.mp4" type="video/mp4">
+    </video>
+</div>
+
+<div class="fireworks-video draggable-video" style="width: 250px; height: 130px;">
+    <video autoplay muted loop>
+        <source src="cat-kitty.mp4" type="video/mp4">
+    </video>
+</div>
+
+<div class="fireworks-video draggable-video" id="noOnlyVideo" style="width: 250px; height: 250px; display: none;">
+    <video autoplay muted loop>
+        <source src="canny-uncanny.mp4" type="video/mp4">
     </video>
 </div>
 
@@ -607,10 +637,10 @@
     const letter = document.getElementById('letter');
     const overlay = document.getElementById('overlay');
     const hearts = document.getElementById('hearts');
-    const fireworksVideo = document.getElementById('fireworksVideo');
     const healthBar = document.getElementById('healthBar');
     const gameOver = document.getElementById('gameOver');
     const heartIcons = document.querySelectorAll('.heart-icon');
+    const noOnlyVideo = document.getElementById('noOnlyVideo');
 
     const cheerSound = document.getElementById('cheerSound');
     const wrongSound = document.getElementById('wrongSound');
@@ -640,10 +670,18 @@
         wrongSound.currentTime = 0;
         wrongSound.play();
 
+        noOnlyVideo.style.display = 'block';
+        noOnlyVideo.classList.add('show');
+
         document.body.classList.remove('pink-mode');
         letter.classList.remove('show');
         overlay.classList.remove('show');
-        fireworksVideo.classList.remove('show');
+
+        document.querySelectorAll('.draggable-video')
+            .forEach(v => {
+                if (v !== noOnlyVideo) v.classList.remove('show');
+            });
+
         hearts.innerHTML = '';
 
         yesButtonScale += 0.1;
@@ -687,9 +725,16 @@
         cheerSound.currentTime = 0;
         cheerSound.play();
 
+        noOnlyVideo.style.display = 'none';
+        noOnlyVideo.classList.remove('show');
+
         document.body.classList.add('pink-mode');
         overlay.classList.add('show');
-        fireworksVideo.classList.add('show');
+
+        document.querySelectorAll('.fireworks-video')
+            .forEach(v => {
+                if (v !== noOnlyVideo) v.classList.add('show');
+            });
 
         setTimeout(() => {
             letter.classList.add('show');
@@ -741,7 +786,8 @@
     overlay.addEventListener('click', function() {
         letter.classList.remove('show');
         overlay.classList.remove('show');
-        fireworksVideo.classList.remove('show');
+        document.querySelectorAll('.draggable-video')
+            .forEach(v => v.classList.remove('show'));
     });
 
     const lockDigits = document.querySelectorAll('.lock-digit');
@@ -754,6 +800,92 @@
             this.setAttribute('data-digit', currentValue);
             this.textContent = currentValue;
         });
+    });
+</script>
+
+<script>
+    const draggableVideos = document.querySelectorAll('.draggable-video');
+
+    // tuning values
+    const VELOCITY_MULTIPLIER = 0.4;
+    const FRICTION = 0.98;
+    const MIN_SPEED = 0.05;
+
+    draggableVideos.forEach(fw => {
+
+        let dragging = false;
+        let offsetX = 0;
+        let offsetY = 0;
+
+        let velX = 0;
+        let velY = 0;
+
+        let lastMouseX = 0;
+        let lastMouseY = 0;
+        let lastTime = 0;
+
+        let animId = null;
+
+        fw.addEventListener('mousedown', e => {
+            dragging = true;
+
+            const rect = fw.getBoundingClientRect();
+            offsetX = e.clientX - rect.left;
+            offsetY = e.clientY - rect.top;
+
+            lastMouseX = e.clientX;
+            lastMouseY = e.clientY;
+            lastTime = performance.now();
+
+            fw.style.transform = 'none';
+            cancelAnimationFrame(animId);
+        });
+
+        document.addEventListener('mousemove', e => {
+            if (!dragging) return;
+
+            const now = performance.now();
+            const dt = now - lastTime || 1;
+
+            velX = ((e.clientX - lastMouseX) / dt) * 16 * VELOCITY_MULTIPLIER;
+            velY = ((e.clientY - lastMouseY) / dt) * 16 * VELOCITY_MULTIPLIER;
+
+            fw.style.left = (e.clientX - offsetX) + 'px';
+            fw.style.top  = (e.clientY - offsetY) + 'px';
+
+            lastMouseX = e.clientX;
+            lastMouseY = e.clientY;
+            lastTime = now;
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (!dragging) return;
+            dragging = false;
+            bounce();
+        });
+
+        function bounce() {
+            const rect = fw.getBoundingClientRect();
+
+            let x = rect.left + velX;
+            let y = rect.top  + velY;
+
+            const maxX = window.innerWidth  - rect.width;
+            const maxY = window.innerHeight - rect.height;
+
+            if (x <= 0 || x >= maxX) velX *= -1;
+            if (y <= 0 || y >= maxY) velY *= -1;
+
+            velX *= FRICTION;
+            velY *= FRICTION;
+
+            fw.style.left = x + 'px';
+            fw.style.top  = y + 'px';
+
+            if (Math.abs(velX) < MIN_SPEED && Math.abs(velY) < MIN_SPEED) return;
+
+            animId = requestAnimationFrame(bounce);
+        }
     });
 </script>
 </body>

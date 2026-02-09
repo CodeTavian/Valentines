@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Be My Valentine?</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Great+Vibes&family=Playfair+Display:wght@400;700&family=Cormorant+Garamond:wght@400;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            transition: background 1s ease;
+        }
+
+        body.pink-mode {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #feada6 100%);
+        }
+
+        .container {
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            color: #333;
+            margin-bottom: 3rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            animation: fadeIn 1s ease-in;
+            transition: color 1s ease;
+        }
+
+        body.pink-mode h1 {
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+        }
+
+        .buttons {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        button {
+            padding: 0.8rem 2rem;
+            font-size: 1.2rem;
+            border: 2px solid #333;
+            border-radius: 0;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: none;
+            background: transparent;
+            color: #333;
+        }
+
+        #yesBtn {
+            transition: all 0.3s ease, transform 0.5s ease;
+        }
+
+        #yesBtn:hover {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border-color: #f093fb;
+            transform: scale(1.05);
+        }
+
+        #noBtn:hover {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            color: white;
+            border-color: #ff9a9e;
+            transform: scale(1.05);
+        }
+
+        #noBtn.shake {
+            animation: shake 0.5s;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            button {
+                padding: 0.6rem 1.5rem;
+                font-size: 1rem;
+            }
+            .buttons {
+                gap: 1rem;
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+            20%, 40%, 60%, 80% { transform: translateX(10px); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Envelope styles */
+        .letter-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            width: 650px;
+            height: 450px;
+            z-index: 100;
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .letter-container.show {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        .envelope {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .envelope-body {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: #EDE8D0;
+            border-radius: 10px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .envelope-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .envelope-flap::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 325px solid transparent;
+            border-right: 325px solid transparent;
+            border-top: 225px solid #C9C5B1;
+            z-index: 2;
+        }
+
+        .envelope-flap::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 325px solid transparent;
+            border-right: 325px solid transparent;
+            border-top: 225px solid #C9C5B1;
+            transform: translateY(-2px);
+            z-index: 1;
+        }
+
+        .envelope-content {
+            position: relative;
+            z-index: 3;
+            padding: 3rem;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-family: 'Dancing Script', cursive;
+        }
+
+        .envelope-content h2 {
+            font-family: 'Dancing Script', cursive;
+            font-weight: 700;
+        }
+
+        .lock-icon {
+            width: 125px;
+            height: 125px;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lock-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .combination-lock {
+            position: absolute;
+            top: 70%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            gap: 0.25rem;
+            justify-content: center;
+            z-index: 5;
+        }
+
+        .lock-digit {
+            width: 18px;
+            height: 24px;
+            border: 1.5px solid black;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 900;
+            font-family: 'Open Sans', monospace;
+            color: black;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .lock-digit:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .lock-digit:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            .lock-icon {
+                width: 90px;
+                height: 90px;
+            }
+
+            .lock-digit {
+                width: 13px;
+                height: 18px;
+                font-size: 0.8rem;
+                border: 1px solid black;
+            }
+
+            .letter-container {
+                width: 90%;
+                max-width: 400px;
+                height: 280px;
+            }
+
+            .envelope-flap::before {
+                border-left: 200px solid transparent;
+                border-right: 200px solid transparent;
+                border-top: 140px solid #C9C5B1;
+            }
+
+            .envelope-flap::after {
+                border-left: 200px solid transparent;
+                border-right: 200px solid transparent;
+                border-top: 140px solid #C9C5B1;
+            }
+
+            .envelope-content {
+                padding: 2rem 1.5rem;
+            }
+        }
+
+        .countdown {
+            font-size: 0.9rem;
+            color: #667eea;
+            margin-top: 0.5rem;
+            font-weight: bold;
+        }
+
+        .countdown-numbers {
+            display: flex;
+            justify-content: center;
+            gap: 0.8rem;
+            margin-top: 0.8rem;
+        }
+
+        .time-unit {
+            text-align: center;
+        }
+
+        .time-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #f5576c;
+            display: block;
+        }
+
+        .time-label {
+            font-size: 0.65rem;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 768px) {
+            .countdown {
+                font-size: 0.8rem;
+            }
+
+            .countdown-numbers {
+                gap: 0.5rem;
+            }
+
+            .time-value {
+                font-size: 1.3rem;
+            }
+
+            .time-label {
+                font-size: 0.55rem;
+            }
+        }
+
+        .hearts {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 2rem;
+            animation: float 6s infinite;
+            opacity: 0;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 50;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+        }
+
+        .overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .fireworks-video {
+            position: fixed;
+            top: 5%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            max-width: 600px;
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s ease;
+            border-radius: 10px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .fireworks-video.show {
+            opacity: 1;
+        }
+
+        .fireworks-video video {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .fireworks-video {
+                width: 90%;
+            }
+        }
+
+        /* Health bar styles */
+        .health-bar {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0.5rem;
+            font-size: 2.5rem;
+            opacity: 0;
+            transition: opacity 1s ease;
+            z-index: 300;
+            pointer-events: none;
+        }
+
+        .health-bar.show {
+            opacity: 1;
+        }
+
+        .heart {
+            transition: transform 0.3s ease;
+        }
+
+        /* Game Over screen */
+        .game-over {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 500;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 2s ease;
+        }
+
+        .game-over.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .game-over-text {
+            font-size: 5rem;
+            color: #8B0000;
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 20px rgba(139, 0, 0, 0.8);
+            animation: fadeInText 3s ease;
+        }
+
+        .game-over-subtitle {
+            font-size: 1.5rem;
+            color: #666;
+            font-family: 'Playfair Display', serif;
+            letter-spacing: 0.1em;
+            animation: fadeInText 3s ease 1s;
+            opacity: 0;
+            animation-fill-mode: forwards;
+        }
+
+        @keyframes fadeInText {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .health-bar {
+                font-size: 1.8rem;
+                gap: 0.3rem;
+            }
+
+            .game-over-text {
+                font-size: 3rem;
+            }
+
+            .game-over-subtitle {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="hearts" id="hearts"></div>
+<div class="overlay" id="overlay"></div>
+
+<!-- Health bar -->
+<div class="health-bar" id="healthBar">
+    <span class="heart-icon" data-index="0">❤️</span>
+    <span class="heart-icon" data-index="1">❤️</span>
+    <span class="heart-icon" data-index="2">❤️</span>
+    <span class="heart-icon" data-index="3">❤️</span>
+    <span class="heart-icon" data-index="4">❤️</span>
+    <span class="heart-icon" data-index="5">❤️</span>
+    <span class="heart-icon" data-index="6">❤️</span>
+    <span class="heart-icon" data-index="7">❤️</span>
+    <span class="heart-icon" data-index="8">❤️</span>
+    <span class="heart-icon" data-index="9">❤️</span>
+</div>
+
+<!-- Game Over screen -->
+<div class="game-over" id="gameOver">
+    <div class="game-over-text">You Died</div>
+    <div class="game-over-subtitle">Hope was lost</div>
+    <audio id="gameOverSound" preload="auto">
+        <source src="death.mp3" type="audio/mpeg">
+    </audio>
+</div>
+
+<div class="fireworks-video" id="fireworksVideo">
+    <video autoplay muted loop>
+        <source src="857068-hd_1280_720_30fps.mp4" type="video/mp4">
+    </video>
+</div>
+
+<audio id="cheerSound" preload="auto">
+    <source src="kids-cheering.mp3" type="audio/mpeg">
+</audio>
+<audio id="wrongSound" preload="auto">
+    <source src="wrong-beep.mp3" type="audio/mpeg">
+</audio>
+
+<div class="container">
+    <h1>Do you want to be my Valentine?</h1>
+    <div class="buttons">
+        <button id="yesBtn">Yes</button>
+        <button id="noBtn">No</button>
+    </div>
+</div>
+
+<div class="letter-container" id="letter">
+    <div class="envelope">
+        <div class="envelope-body"></div>
+        <div class="envelope-flap"></div>
+        <div class="envelope-content">
+            <div class="lock-icon">
+                <img src="lock-icon.png" alt="Lock" id="lockIcon">
+                <div class="combination-lock">
+                    <div class="lock-digit" data-digit="0">0</div>
+                    <div class="lock-digit" data-digit="0">0</div>
+                    <div class="lock-digit" data-digit="0">0</div>
+                    <div class="lock-digit" data-digit="0">0</div>
+                </div>
+                <audio id="lockClickSound" preload="auto">
+                    <source src="click.mp3" type="audio/mpeg">
+                </audio>
+            </div>
+            <h2 style="color:#f5576c;margin-bottom:0.5rem;font-size:1.3rem;">Your Valentine's Letter</h2>
+            <div class="countdown">Unlocks in:</div>
+            <div class="countdown-numbers" id="countdown"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const yesBtn = document.getElementById('yesBtn');
+    const noBtn = document.getElementById('noBtn');
+    const letter = document.getElementById('letter');
+    const overlay = document.getElementById('overlay');
+    const hearts = document.getElementById('hearts');
+    const fireworksVideo = document.getElementById('fireworksVideo');
+    const healthBar = document.getElementById('healthBar');
+    const gameOver = document.getElementById('gameOver');
+    const heartIcons = document.querySelectorAll('.heart-icon');
+
+    const cheerSound = document.getElementById('cheerSound');
+    const wrongSound = document.getElementById('wrongSound');
+    const lockClickSound = document.getElementById('lockClickSound');
+
+    const noResponses = [
+        "No","Are you sure?","Are you really sure?",
+        "Are you sure that you're sure?","Please reconsider?",
+        "Are you sure that you're sure that you're sure?",
+        "Are you sure that you're sure that you're sure that you're sure?",
+        "Are you absolutely certain?",
+        "Are you sure that you're sure that you're sure that you're sure that you're sure?",
+        "Come on, please?","Pretty please?",
+        "Last chance.","No really, last chance.",
+        "Last chance for real this time.","Seriously, last chance.",
+        "Final chance.","This is really the last chance.",
+        "Last chance, I mean it.","Okay, last chance for real now.",
+        "No really, last chance this time for real now.","Last chance."
+    ];
+
+    let noClickCount = 0;
+    let yesButtonScale = 1;
+    let healthBarShown = false;
+    let currentHealth = 10;
+
+    noBtn.addEventListener('click', function() {
+        wrongSound.currentTime = 0;
+        wrongSound.play();
+
+        document.body.classList.remove('pink-mode');
+        letter.classList.remove('show');
+        overlay.classList.remove('show');
+        fireworksVideo.classList.remove('show');
+        hearts.innerHTML = '';
+
+        yesButtonScale += 0.1;
+        yesBtn.style.transform = `scale(${yesButtonScale})`;
+
+        noBtn.classList.add('shake');
+        setTimeout(() => noBtn.classList.remove('shake'), 500);
+
+        if (noClickCount < noResponses.length - 1) {
+            noClickCount++;
+            noBtn.textContent = noResponses[noClickCount];
+            return;
+        }
+
+        if (!healthBarShown) {
+            healthBarShown = true;
+            healthBar.classList.add('show');
+            return;
+        }
+
+        // break ONE heart per click
+        if (currentHealth > 0) {
+            currentHealth--;
+            const heart = heartIcons[currentHealth];
+            heart.textContent = '💔';
+            heart.style.transform = 'scale(1.2)';
+            setTimeout(() => heart.style.transform = 'scale(1)', 300);
+
+            if (currentHealth === 0) {
+                setTimeout(() => {
+                    healthBar.classList.remove('show');
+                    gameOver.classList.add('show');
+                    document.getElementById('gameOverSound').play();
+                }, 1000);
+            }
+        }
+    });
+
+    // Yes button logic
+    yesBtn.addEventListener('click', function() {
+        cheerSound.currentTime = 0;
+        cheerSound.play();
+
+        document.body.classList.add('pink-mode');
+        overlay.classList.add('show');
+        fireworksVideo.classList.add('show');
+
+        setTimeout(() => {
+            letter.classList.add('show');
+        }, 500);
+
+        createHearts();
+        startCountdown();
+    });
+
+    function createHearts() {
+        for (let i = 0; i < 20; i++) {
+            setTimeout(() => {
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                heart.textContent = '❤️';
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.animationDelay = Math.random() * 2 + 's';
+                heart.style.animationDuration = (Math.random() * 3 + 4) + 's';
+                hearts.appendChild(heart);
+            }, i * 200);
+        }
+    }
+
+    function startCountdown() {
+        const valentinesDay = new Date('February 14, 2026 00:00:00').getTime();
+        const countdownElement = document.getElementById('countdown');
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = valentinesDay - now;
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            countdownElement.innerHTML = `
+                <div class="time-unit"><span class="time-value">${days}</span><span class="time-label">Days</span></div>
+                <div class="time-unit"><span class="time-value">${hours}</span><span class="time-label">Hours</span></div>
+                <div class="time-unit"><span class="time-value">${minutes}</span><span class="time-label">Minutes</span></div>
+                <div class="time-unit"><span class="time-value">${seconds}</span><span class="time-label">Seconds</span></div>
+            `;
+        }
+
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+    }
+
+    overlay.addEventListener('click', function() {
+        letter.classList.remove('show');
+        overlay.classList.remove('show');
+        fireworksVideo.classList.remove('show');
+    });
+
+    const lockDigits = document.querySelectorAll('.lock-digit');
+    lockDigits.forEach(digit => {
+        digit.addEventListener('click', function() {
+            lockClickSound.currentTime = 0;
+            lockClickSound.play();
+            let currentValue = parseInt(this.getAttribute('data-digit'));
+            currentValue = (currentValue + 1) % 10;
+            this.setAttribute('data-digit', currentValue);
+            this.textContent = currentValue;
+        });
+    });
+</script>
+</body>
+</html>
